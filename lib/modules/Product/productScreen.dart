@@ -114,7 +114,8 @@ class ProductScreen extends StatelessWidget {
                                         offset: offcet,
                                         count: product.images!.length,
                                         effect: WormEffect(
-                                          dotColor: Colors.black38,
+                                          dotColor:
+                                              Color.fromARGB(95, 65, 65, 65),
                                           dotHeight: 10,
                                           dotWidth: 10,
                                           activeDotColor: Colors.black,
@@ -141,6 +142,15 @@ class ProductScreen extends StatelessWidget {
                                         onTap: () {
                                           savedd = ProjectCubit.get(context)
                                               .changeSavedState(savedd);
+                                          if (savedd == true) {
+                                            ProjectCubit.get(context)
+                                                .addFavorite(
+                                                    productId: product.id);
+                                          } else {
+                                            ProjectCubit.get(context)
+                                                .deleteFavorite(
+                                                    productId: product.id);
+                                          }
                                         },
                                         child: Icon(
                                           savedd
@@ -238,9 +248,12 @@ class ProductScreen extends StatelessWidget {
                     SizedBox(
                       height: 10,
                     ),
-                    Divider(
-                      height: 1,
-                      color: Colors.black38,
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 15),
+                      child: Divider(
+                        height: 1,
+                        color: Colors.black38,
+                      ),
                     ),
                     SizedBox(
                       height: 10,
@@ -272,9 +285,12 @@ class ProductScreen extends StatelessWidget {
                     SizedBox(
                       height: 10,
                     ),
-                    Divider(
-                      height: 1,
-                      color: Colors.black38,
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 15),
+                      child: Divider(
+                        height: 1,
+                        color: Colors.black38,
+                      ),
                     ),
                     SizedBox(
                       height: 10,
@@ -332,9 +348,12 @@ class ProductScreen extends StatelessWidget {
                     SizedBox(
                       height: 10,
                     ),
-                    Divider(
-                      height: 1,
-                      color: Colors.black38,
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 15),
+                      child: Divider(
+                        height: 1,
+                        color: Colors.black38,
+                      ),
                     ),
                     SizedBox(
                       height: 10,
@@ -425,9 +444,13 @@ class ProductScreen extends StatelessWidget {
                               separatorBuilder: (context, index) => Padding(
                                 padding:
                                     const EdgeInsets.symmetric(vertical: 10),
-                                child: Divider(
-                                  color: Colors.black38,
-                                  height: 1,
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 15),
+                                  child: Divider(
+                                    height: 1,
+                                    color: Colors.black38,
+                                  ),
                                 ),
                               ),
                               itemCount: ProjectCubit.get(context)

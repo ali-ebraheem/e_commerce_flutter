@@ -1,82 +1,115 @@
+import 'package:conditional_builder_null_safety/conditional_builder_null_safety.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:project_collage/Shared/components/components.dart';
+import '../../Cubit/cubit.dart';
+import '../../Cubit/states.dart';
 
 class ChatScreen extends StatelessWidget {
+  final name;
+  final image;
+  ChatScreen({@required this.name, @required this.image});
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        actions: [],
-        title: Row(
-          children: [
-            CircleAvatar(
-              child: Icon(Icons.person),
-            ),
-            const SizedBox(
-              width: 16,
-            ),
-            Expanded(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'ali ebraheem',
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(fontSize: 14, color: textColor),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    'online',
-                    style: TextStyle(
-                      color: Color.fromARGB(255, 89, 187, 92),
-                      fontSize: 12,
+    ProjectCubit.get(context).listenToDatabase();
+
+    return Builder(builder: (BuildContext context) {
+      return BlocConsumer<ProjectCubit, ProjectStates>(
+          listener: (context, state) {},
+          builder: (context, state) {
+            return Scaffold(
+              appBar: AppBar(
+                actions: [],
+                title: Row(
+                  children: [
+                    CircleAvatar(
+                      backgroundImage: NetworkImage(image),
                     ),
-                  )
-                ],
+                    const SizedBox(
+                      width: 16,
+                    ),
+                    Expanded(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            name,
+                            overflow: TextOverflow.ellipsis,
+                            style:
+                                const TextStyle(fontSize: 14, color: textColor),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            'online',
+                            style: TextStyle(
+                              color: Color.fromARGB(255, 89, 187, 92),
+                              fontSize: 12,
+                            ),
+                          )
+                        ],
+                      ),
+                    )
+                  ],
+                ),
+                leading: IconButton(
+                  icon: Icon(
+                    Icons.arrow_back_ios_new_rounded,
+                    color: Colors.black,
+                  ),
+                  onPressed: () {
+                    ProjectCubit.get(context)
+                        .messageConversationModel!
+                        .data!
+                        .clear();
+                    ProjectCubit.get(context).getAllConversation();
+                    Navigator.pop(context);
+                  },
+                ),
               ),
-            )
-          ],
-        ),
-        leading: IconButton(
-          icon: Icon(
-            Icons.arrow_back_ios_new_rounded,
-            color: Colors.black,
-          ),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
-      ),
-      body: Column(children: [
-        Expanded(
-          child: messageList(messages: [
-            {
-              "id": '3',
-              "body":
-                  "igroigjortoghoir ohtgoehrtgo hrtogihoeit ierohtgoih rthgo ihrtgj",
-              "date": "12:12"
-            },
-            {
-              "id": '4',
-              "body": "gtregrtg tegre ggggertg gertg rtg",
-              "date": "12:12"
-            },
-            {"id": '3', "body": "hdrtjhoij drhpo", "date": "12:12"},
-            {"id": '4', "body": "hoihasohid", "date": "12:12"},
-            {
-              "id": '3',
-              "body": "thdrth ipohiopidrtohi ptohrt",
-              "date": "12:12"
-            },
-            {"id": '3', "body": "hdrthiu poritho", "date": "12:12"},
-            {"id": '3', "body": "htrhhtdrho htdrh", "date": "12:12"},
-            {"id": '3', "body": "yghsrtgo otrhoi tyrh ", "date": "12:12"}
-          ]),
-        ),
-        actionBar(),
-      ]),
-    );
+              body: Column(children: [
+                Expanded(
+                  child: ConditionalBuilder(
+                    condition:
+                        ProjectCubit.get(context).messageConversationModel ==
+                            null,
+                    builder: (context) => Padding(
+                      padding: const EdgeInsets.only(top: 250),
+                      child: Center(
+                          child: CircularProgressIndicator(
+                        color: switchColors,
+                      )),
+                    ),
+                    fallback: (context) => messageList(
+                        messages: ProjectCubit.get(context)
+                                    .messageConversationModel!
+                                    .data ==
+                                null
+                            ? []
+                            : new List.from(ProjectCubit.get(context)
+                                .messageConversationModel!
+                                .data!
+                                .reversed)),
+                  ),
+                ),
+                actionBar(
+                    message: () {
+                      ProjectCubit.get(context).realTimeDatabase(
+                          text: controller.text,
+                          conversationId:
+                              ProjectCubit.get(context).converastionid);
+                    },
+                    sendMessage: () {
+                      ProjectCubit.get(context).sendMessage(
+                          conversationId:
+                              ProjectCubit.get(context).converastionid,
+                          body: controller.text);
+                    },
+                    count: () {}),
+              ]),
+            );
+          });
+    });
   }
 
   Widget messageList({@required messages}) {
@@ -84,11 +117,11 @@ class ChatScreen extends StatelessWidget {
       padding: const EdgeInsets.all(8.0),
       child: ListView.separated(
         physics: BouncingScrollPhysics(),
-        itemCount: messages.length + 1,
+        itemCount: messages.length,
         reverse: true,
         separatorBuilder: (context, index) {
           if (index == messages.length - 1) {
-            return dateLable();
+            return dateLable(time: messages[index].createdAt);
           }
           if (messages.length == 1) {
             return const SizedBox.shrink();
@@ -97,8 +130,9 @@ class ChatScreen extends StatelessWidget {
           } else if (index <= messages.length) {
             final message = messages[index];
             final nextMessage = messages[index + 1];
-            if (true) {
-              return dateLable();
+            if (message.createdAt.substring(0, 10) !=
+                nextMessage.createdAt.substring(0, 10)) {
+              return dateLable(time: message.createdAt);
             } else {
               return const SizedBox.shrink();
             }
@@ -109,7 +143,7 @@ class ChatScreen extends StatelessWidget {
         itemBuilder: (context, index) {
           if (index < messages.length) {
             final message = messages[index];
-            if (index.isEven) {
+            if (message.userId == myId) {
               return messageOwnTile(message: message);
             } else {
               return messageTile(message: message);
@@ -127,104 +161,102 @@ const _borderRadius = 26.0;
 
 @override
 Widget messageTile({@required message}) {
-  return Padding(
-    padding: const EdgeInsets.symmetric(vertical: 4),
-    child: Align(
-      alignment: Alignment.centerLeft,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            decoration: BoxDecoration(
-              color: secondColor,
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(_borderRadius),
-                topRight: Radius.circular(_borderRadius),
-                bottomRight: Radius.circular(_borderRadius),
+  return ConditionalBuilder(
+      condition: message.body == 'messageConversationModel1!.body',
+      builder: (c) {
+        return SizedBox();
+      },
+      fallback: (c) => Padding(
+            padding: const EdgeInsets.symmetric(vertical: 4),
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    decoration: BoxDecoration(
+                      color: secondColor,
+                      borderRadius: const BorderRadius.only(
+                        topLeft: Radius.circular(_borderRadius),
+                        topRight: Radius.circular(_borderRadius),
+                        bottomRight: Radius.circular(_borderRadius),
+                      ),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12.0, vertical: 20),
+                      child: Text('${message.body}'),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 8.0),
+                    child: Text(
+                      '${message.createdAt.substring(11, 16)}',
+                      style: const TextStyle(
+                        color: textColor,
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  )
+                ],
               ),
             ),
-            child: Padding(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 12.0, vertical: 20),
-              child: Text('${message!['body']}'),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(top: 8.0),
-            child: Text(
-              '11:12 pm',
-              style: const TextStyle(
-                color: textColor,
-                fontSize: 10,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          )
-        ],
-      ),
-    ),
-  );
+          ));
 }
 
 @override
 Widget messageOwnTile({@required message}) {
-  return Padding(
-    padding: const EdgeInsets.symmetric(vertical: 4.0),
-    child: Align(
-      alignment: Alignment.centerRight,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.end,
-        children: [
-          Container(
-            decoration: const BoxDecoration(
-              color: switchColors,
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(_borderRadius),
-                bottomRight: Radius.circular(_borderRadius),
-                bottomLeft: Radius.circular(_borderRadius),
+  return ConditionalBuilder(
+      condition: message.body == 'messageConversationModel1!.body',
+      builder: (c) {
+        return SizedBox();
+      },
+      fallback: (c) => Padding(
+            padding: const EdgeInsets.symmetric(vertical: 4.0),
+            child: Align(
+              alignment: Alignment.centerRight,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Container(
+                    decoration: const BoxDecoration(
+                      color: switchColors,
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(_borderRadius),
+                        bottomRight: Radius.circular(_borderRadius),
+                        bottomLeft: Radius.circular(_borderRadius),
+                      ),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12.0, vertical: 20),
+                      child: Text('${message.body}',
+                          style: const TextStyle(
+                            color: Colors.white,
+                          )),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 8.0),
+                    child: Text(
+                      '${message.createdAt.substring(11, 16)}',
+                      style: const TextStyle(
+                        color: textColor,
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  )
+                ],
               ),
             ),
-            child: Padding(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 12.0, vertical: 20),
-              child: Text(message["body"],
-                  style: const TextStyle(
-                    color: Colors.white,
-                  )),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(top: 8.0),
-            child: Text(
-              '12:12 pm',
-              style: const TextStyle(
-                color: textColor,
-                fontSize: 10,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          )
-        ],
-      ),
-    ),
-  );
+          ));
 }
 
-var dayInfo;
-Widget dateLable() {
-  if (false) {
-    dayInfo = 'TODAY';
-  } else if (true) {
-    dayInfo = 'YESTERDAY';
-  } else if (true) {
-    dayInfo = '0';
-  } else if (true) {
-    dayInfo = '0';
-  } else {
-    dayInfo = '0';
-  }
+Widget dateLable({@required time}) {
   return Center(
     child: Padding(
       padding: const EdgeInsets.symmetric(vertical: 32.0),
@@ -236,7 +268,7 @@ Widget dateLable() {
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 12),
           child: Text(
-            dayInfo,
+            time.substring(0, 10),
             style: const TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.bold,
@@ -251,7 +283,10 @@ Widget dateLable() {
 
 final TextEditingController controller = TextEditingController();
 
-Widget actionBar() {
+Widget actionBar(
+    {@required Function? message,
+    @required Function? sendMessage,
+    @required Function? count}) {
   return SafeArea(
     bottom: true,
     top: false,
@@ -284,7 +319,6 @@ Widget actionBar() {
                 hintText: 'Type something...',
                 border: InputBorder.none,
               ),
-              onSubmitted: (_) => () {},
             ),
           ),
         ),
@@ -293,7 +327,12 @@ Widget actionBar() {
           child: GlowingActionButton(
             color: switchColors,
             icon: Icons.send_rounded,
-            onPressed: () {},
+            onPressed: () {
+              count!();
+              sendMessage!();
+              message!();
+              controller.clear();
+            },
           ),
         ),
       ],

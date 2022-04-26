@@ -5,25 +5,18 @@ import 'package:flutter_svg/svg.dart';
 import 'package:project_collage/Cubit/cubit.dart';
 import 'package:project_collage/Cubit/states.dart';
 import 'package:project_collage/Shared/components/components.dart';
+import 'package:project_collage/modules/Chat/ChatScreen.dart';
 
 class ProfileScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    List<bool> savedd = [
-      false,
-      false,
-      false,
-      false,
-      false,
-      false,
-      false,
-      false,
-      false,
-      false,
-    ];
+    List<bool> savedd = [];
     return BlocConsumer<ProjectCubit, ProjectStates>(
         listener: (context, state) {},
         builder: (context, state) {
+          for (var i = 0; i < 1000; i++) {
+            savedd.add(false);
+          }
           var profileCubit = ProjectCubit.get(context);
           return Scaffold(
               appBar: AppBar(
@@ -34,11 +27,14 @@ class ProfileScreen extends StatelessWidget {
                 ),
                 elevation: 0,
                 leading: IconButton(
+                  padding: const EdgeInsets.all(0),
                   icon: Icon(
                     Icons.arrow_back_ios_new_rounded,
                     color: Colors.black,
                   ),
                   onPressed: () {
+                    ProjectCubit.get(context).changeFollowersModel();
+                    ProjectCubit.get(context).changeFollowingModel();
                     Navigator.pop(context);
                   },
                 ),
@@ -73,6 +69,10 @@ class ProfileScreen extends StatelessWidget {
                   child: Column(
                     children: [
                       profileItem(
+                          cache: () {
+                            ProjectCubit.get(context).addprofileCache(
+                                value: ProjectCubit.get(context).profile);
+                          },
                           followers:
                               ProjectCubit.get(context).followersModel!.data,
                           context: context,
@@ -108,44 +108,12 @@ class ProfileScreen extends StatelessWidget {
                           condition: email !=
                               ProjectCubit.get(context).profile!.data![0].email,
                           fallback: (context) => Center(child: Container()),
-                          builder: (context) => Row(
+                          builder: (context) => Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 15),
+                              child: Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  Container(
-                                    height: 35,
-                                    width: 160,
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(5),
-                                      color: secondColor,
-                                    ),
-                                    child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          Container(
-                                            width: 110,
-                                            child: Text(
-                                              '${profileCubit.profile!.data![0].phone}',
-                                              maxLines: 1,
-                                              overflow: TextOverflow.ellipsis,
-                                              style: TextStyle(
-                                                  fontSize: 16,
-                                                  fontWeight: FontWeight.bold,
-                                                  color: switchColors),
-                                            ),
-                                          ),
-                                          SizedBox(
-                                            width: 5,
-                                          ),
-                                          Icon(
-                                            Icons.phone,
-                                            color: switchColors,
-                                          )
-                                        ]),
-                                  ),
-                                  SizedBox(
-                                    width: 105,
-                                  ),
                                   InkWell(
                                       onTap: () {
                                         ProjectCubit.get(context)
@@ -193,9 +161,52 @@ class ProfileScreen extends StatelessWidget {
                                                 fontSize: 16),
                                           ),
                                         ),
-                                      ))
+                                      )),
+                                  Spacer(),
+                                  InkWell(
+                                      onTap: (() {
+                                        ProjectCubit.get(context)
+                                            .createConversation(
+                                                userId:
+                                                    ProjectCubit.get(context)
+                                                        .profile!
+                                                        .data![0]
+                                                        .id);
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) => ChatScreen(
+                                                    image: ProjectCubit.get(
+                                                            context)
+                                                        .profile!
+                                                        .data![0]
+                                                        .picture,
+                                                    name: ProjectCubit.get(
+                                                            context)
+                                                        .profile!
+                                                        .data![0]
+                                                        .name,
+                                                  )),
+                                        );
+                                      }),
+                                      child: Container(
+                                        height: 35,
+                                        width: 100,
+                                        decoration: BoxDecoration(
+                                            color: switchColors,
+                                            borderRadius:
+                                                BorderRadius.circular(5)),
+                                        child: Center(
+                                          child: Text(
+                                            'Message',
+                                            style: TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 16),
+                                          ),
+                                        ),
+                                      )),
                                 ],
-                              )),
+                              ))),
                       ConditionalBuilder(
                           condition: email !=
                               ProjectCubit.get(context).profile!.data![0].email,
@@ -216,6 +227,22 @@ class ProfileScreen extends StatelessWidget {
                             padding: const EdgeInsets.only(
                                 left: 15, right: 15, top: 20),
                             child: categoryItem(
+                                deleteFavorite: () {
+                                  ProjectCubit.get(context).deleteFavorite(
+                                      productId: ProjectCubit.get(context)
+                                          .profile
+                                          ?.data![0]
+                                          .products![index]
+                                          .id);
+                                },
+                                addFavorite: () {
+                                  ProjectCubit.get(context).addFavorite(
+                                      productId: ProjectCubit.get(context)
+                                          .profile
+                                          ?.data![0]
+                                          .products![index]
+                                          .id);
+                                },
                                 price: ProjectCubit.get(context)
                                     .profile
                                     ?.data![0]

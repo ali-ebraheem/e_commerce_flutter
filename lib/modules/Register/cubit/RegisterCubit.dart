@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:project_collage/Shared/components/components.dart';
 import 'package:project_collage/Shared/network/cacheHelper.dart';
 import 'package:project_collage/Shared/network/dio_helper.dart';
-import 'package:project_collage/models/loginModel.dart';
+import 'package:project_collage/models/LoginModel.dart';
 import 'package:project_collage/modules/Register/cubit/RegisterStates.dart';
 
 class RegisterCubit extends Cubit<RegisterStates> {

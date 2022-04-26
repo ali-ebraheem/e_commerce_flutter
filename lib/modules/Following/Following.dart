@@ -6,6 +6,8 @@ import 'package:project_collage/Cubit/cubit.dart';
 import 'package:project_collage/Cubit/states.dart';
 import 'package:project_collage/Shared/components/components.dart';
 
+import '../Profile/profile.dart';
+
 class FollowingScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -30,6 +32,7 @@ class FollowingScreen extends StatelessWidget {
                   color: Colors.black,
                 ),
                 onPressed: () {
+                  ProjectCubit.get(context).changeprofileModel();
                   Navigator.pop(context);
                 },
               ),
@@ -97,22 +100,44 @@ class FollowingScreen extends StatelessWidget {
 
                           ListView.separated(
                             physics: BouncingScrollPhysics(),
-                            itemBuilder: (context, index) => followingItem(
-                              followState[index],
-                              () {
-                                followState[index] = ProjectCubit.get(context)
-                                    .changeFollowingState(followState[index]);
-                              },
-                              context,
-                              ProjectCubit.get(context)
-                                  .followingModel!
-                                  .data![index],
-                            ),
+                            itemBuilder: (context, index) => InkWell(
+                                onTap: () {
+                                  ProjectCubit.get(context).addFollowingCache(
+                                      value: ProjectCubit.get(context)
+                                          .followingModel);
+                                  ProjectCubit.get(context).getProfileUser(
+                                      id: ProjectCubit.get(context)
+                                          .followingModel!
+                                          .data![index]
+                                          .id);
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              ProfileScreen()));
+                                },
+                                child: followingItem(
+                                  followState[index],
+                                  () {
+                                    followState[index] =
+                                        ProjectCubit.get(context)
+                                            .changeFollowingState(
+                                                followState[index]);
+                                  },
+                                  context,
+                                  ProjectCubit.get(context)
+                                      .followingModel!
+                                      .data![index],
+                                )),
                             separatorBuilder: (context, index) => Padding(
                               padding: const EdgeInsets.symmetric(vertical: 20),
-                              child: Divider(
-                                height: 1,
-                                color: Colors.black38,
+                              child: Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 15),
+                                child: Divider(
+                                  height: 1,
+                                  color: Colors.black38,
+                                ),
                               ),
                             ),
                             itemCount: ProjectCubit.get(context)

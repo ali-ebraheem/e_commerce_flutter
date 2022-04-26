@@ -81,3 +81,59 @@ class DeleteCommentErrorState extends ProjectStates {}
 class DeleteCommentLoadingState extends ProjectStates {}
 
 class DeleteCommentSuccussState extends ProjectStates {}
+
+class GetConversatinErrorState extends ProjectStates {}
+
+class GetConversatinLoadingState extends ProjectStates {}
+
+class GetConversatinSuccussState extends ProjectStates {}
+
+class PostConversationErrorState extends ProjectStates {}
+
+class PostConversationLoadingState extends ProjectStates {}
+
+class PostConversationSuccussState extends ProjectStates {}
+
+class PostConversationSeenErrorState extends ProjectStates {}
+
+class PostConversationSeenLoadingState extends ProjectStates {}
+
+class PostConversationSeenSuccussState extends ProjectStates {}
+
+class PostSendConversationErrorState extends ProjectStates {}
+
+class PostSendConversationLoadingState extends ProjectStates {}
+
+class PostSendConversationSuccussState extends ProjectStates {}
+
+class RealTimeErrorState extends ProjectStates {}
+
+class RealTimeLoadingState extends ProjectStates {}
+
+class RealTimeSuccussState extends ProjectStates {}
+
+class PostFavoriteErrorState extends ProjectStates {}
+
+class PostFavoriteLoadingState extends ProjectStates {}
+
+class PostFavoriteSuccussState extends ProjectStates {}
+
+class GetFavoriteErrorState extends ProjectStates {}
+
+class GetFavoriteLoadingState extends ProjectStates {}
+
+class GetFavoriteSuccussState extends ProjectStates {}
+
+class DeleteFavoriteErrorState extends ProjectStates {}
+
+class DeleteFavoriteLoadingState extends ProjectStates {}
+
+class DeleteFavoriteSuccussState extends ProjectStates {}
+
+class AddTofollowingCache extends ProjectStates {}
+
+class GetMessageConversationErrorState extends ProjectStates {}
+
+class GetMessageConversationLoadingState extends ProjectStates {}
+
+class GetMessageConversationSuccussState extends ProjectStates {}

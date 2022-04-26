@@ -74,7 +74,13 @@ class NavegationDrawer extends StatelessWidget {
                                 selectedItem(context, 4);
                               }),
                           const SizedBox(height: 20),
-                          Divider(color: switchColors),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 15),
+                            child: Divider(
+                              height: 1,
+                              color: switchColors,
+                            ),
+                          ),
                           const SizedBox(height: 20),
                           buildMenuItem(
                             text: 'Categories',
@@ -142,12 +148,14 @@ void selectedItem(BuildContext context, int index) {
 
       break;
     case 1:
+      ProjectCubit.get(context).getAllConversation();
       Navigator.push(
         context,
         MaterialPageRoute(builder: (context) => MessagesScreen()),
       );
       break;
     case 2:
+      ProjectCubit.get(context).getFavorite();
       Navigator.push(
         context,
         MaterialPageRoute(builder: (context) => SavedScreen()),

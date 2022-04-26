@@ -116,8 +116,8 @@ class DashboardScreen extends StatelessWidget {
                       );
                       Fluttertoast.showToast(
                           msg: "Your product has been posted",
-                          toastLength: Toast.LENGTH_LONG,
-                          gravity: ToastGravity.CENTER,
+                          toastLength: Toast.LENGTH_SHORT,
+                          gravity: ToastGravity.BOTTOM,
                           timeInSecForIosWeb: 1,
                           backgroundColor: Colors.green,
                           textColor: Colors.white,
@@ -126,8 +126,8 @@ class DashboardScreen extends StatelessWidget {
                     } else {
                       Fluttertoast.showToast(
                           msg: "Please fill in all fields",
-                          toastLength: Toast.LENGTH_LONG,
-                          gravity: ToastGravity.CENTER,
+                          toastLength: Toast.LENGTH_SHORT,
+                          gravity: ToastGravity.BOTTOM,
                           timeInSecForIosWeb: 1,
                           backgroundColor: Colors.red,
                           textColor: Colors.white,

@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:project_collage/Cubit/cubit.dart';
 import 'package:project_collage/Shared/network/cacheHelper.dart';
 import 'package:project_collage/models/FollowingModel.dart';
-import 'package:project_collage/modules/Chat/ChatScreen.dart';
 import 'package:project_collage/modules/Followers/Followers.dart';
 import 'package:project_collage/modules/Following/Following.dart';
 
@@ -26,6 +25,12 @@ const String allCategories = 'allCategories';
 const String storeComment = 'store_comment';
 const String ProductComments = 'Product_comments';
 const String deleteComment = 'delete_comment';
+const String conversations = 'Conversations';
+const String conversationsStore = 'Conversations/store';
+const String storeFavoriteItem = 'store_favorite_item';
+const String favoritesProducts = 'favorites_Products';
+const String deleteFavoriteItem = 'delete_favorite_item';
+const String messages = 'messages';
 String token = CacheHelper.getData(key: 'token');
 String email = CacheHelper.getData(key: 'email');
 String name = CacheHelper.getData(key: 'name');
@@ -104,12 +109,13 @@ Widget productHome(
       ),
     );
 
-Widget messageItem({required context}) => InkWell(
-    onTap: () {
-      Navigator.push(
-          context, MaterialPageRoute(builder: (context) => ChatScreen()));
-    },
-    child: Padding(
+Widget messageItem(
+        {required context,
+        @required image,
+        @required name,
+        @required date,
+        @required lastMessage}) =>
+    Padding(
         padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 15),
         child: Container(
           child: Row(
@@ -118,9 +124,7 @@ Widget messageItem({required context}) => InkWell(
             children: [
               CircleAvatar(
                 radius: 30,
-                child: Image(
-                  image: AssetImage('assets/images/Profile Image.png'),
-                ),
+                backgroundImage: NetworkImage(image),
                 backgroundColor: switchColors,
               ),
               SizedBox(
@@ -135,7 +139,7 @@ Widget messageItem({required context}) => InkWell(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Ali ebraheem',
+                        name,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
@@ -147,7 +151,9 @@ Widget messageItem({required context}) => InkWell(
                         height: 15,
                       ),
                       Text(
-                        'nice to meet you ',
+                        lastMessage == 'messageConversationModel1!.body'
+                            ? 'there is not any message'
+                            : lastMessage,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
@@ -162,7 +168,7 @@ Widget messageItem({required context}) => InkWell(
               Padding(
                   padding: const EdgeInsets.only(top: 5),
                   child: Text(
-                    '8:40 pm',
+                    date,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
@@ -172,7 +178,7 @@ Widget messageItem({required context}) => InkWell(
                   ))
             ],
           ),
-        )));
+        ));
 Widget categoriesItem({@required name, @required image}) => Column(
       children: [
         Container(
@@ -203,6 +209,8 @@ Widget categoriesItem({@required name, @required image}) => Column(
       ],
     );
 Widget categoryItem({
+  @required Function? deleteFavorite,
+  @required Function? addFavorite,
   @required bool? saved,
   @required Function? changeSaved,
   @required context,
@@ -296,6 +304,11 @@ Widget categoryItem({
                   alignment: Alignment.bottomRight,
                   onPressed: () {
                     changeSaved!();
+                    if (saved == false) {
+                      addFavorite!();
+                    } else {
+                      deleteFavorite!();
+                    }
                   },
                   icon: Icon(
                     saved! ? Icons.favorite : Icons.favorite_outline,
@@ -477,6 +490,7 @@ Widget commentItem({
           ),
         ));
 Widget profileItem({
+  @required Function? cache,
   @required image,
   @required name,
   @required Function? getFollowers,
@@ -530,6 +544,7 @@ Widget profileItem({
                           children: [
                             TextButton(
                                 onPressed: () {
+                                  cache!();
                                   List<dynamic> followingId = [];
                                   for (var i = 0; i < folloings!.length; i++) {
                                     followingId.add(folloings[i].id);
@@ -569,6 +584,7 @@ Widget profileItem({
                             ),
                             TextButton(
                                 onPressed: () {
+                                  cache!();
                                   Navigator.of(context).push(MaterialPageRoute(
                                       builder: (context) => FollowingScreen()));
                                   getFollowing!();
@@ -597,160 +613,162 @@ Widget profileItem({
                     ),
                   ),
                 ),
+                Spacer(),
+                IconButton(
+                    splashRadius: 0.1,
+                    alignment: Alignment.topRight,
+                    padding: const EdgeInsets.only(top: 8),
+                    onPressed: () {},
+                    icon: Icon(
+                      Icons.call,
+                      color: switchColors,
+                    ))
               ],
             ),
           ),
         ));
 Widget followingItem(bool followState, Function changeFollowState, context,
         Data? followingModel) =>
-    InkWell(
-        onTap: () {},
-        child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: Container(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  CircleAvatar(
-                    backgroundImage: NetworkImage('${followingModel!.picture}'),
-                    radius: 30,
-                    backgroundColor: switchColors,
-                  ),
-                  SizedBox(
-                    width: 20,
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 10),
-                    child: Container(
-                      width: 100,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            '${followingModel.name}',
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                                color: textColor,
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  Spacer(),
-                  Padding(
-                      padding: const EdgeInsets.only(top: 15),
-                      child: InkWell(
-                          onTap: () {
-                            print(followState);
-                            changeFollowState();
-                            if (!followState) {
-                              ProjectCubit.get(context)
-                                  .addFollowing(fllowingId: followingModel.id);
-                            } else {
-                              ProjectCubit.get(context).deleteFollowing(
-                                  fllowingId: followingModel.id);
-                            }
-                            print(followState);
-                          },
-                          child: Container(
-                            height: 30,
-                            decoration: BoxDecoration(
-                                color:
-                                    followState ? Colors.black54 : switchColors,
-                                borderRadius: BorderRadius.circular(5)),
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 15, vertical: 6),
-                              child: Text(
-                                followState ? 'Following' : 'Follow +',
-                                style: TextStyle(
-                                    color: Colors.white, fontSize: 14),
-                              ),
-                            ),
-                          )))
-                ],
+    Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20),
+        child: Container(
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              CircleAvatar(
+                backgroundImage: NetworkImage('${followingModel!.picture}'),
+                radius: 30,
+                backgroundColor: switchColors,
               ),
-            )));
+              SizedBox(
+                width: 20,
+              ),
+              Padding(
+                padding: const EdgeInsets.only(top: 10),
+                child: Container(
+                  width: 100,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        '${followingModel.name}',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                            color: textColor,
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              Spacer(),
+              Padding(
+                  padding: const EdgeInsets.only(top: 15),
+                  child: InkWell(
+                      onTap: () {
+                        print(followState);
+                        changeFollowState();
+                        if (!followState) {
+                          ProjectCubit.get(context)
+                              .addFollowing(fllowingId: followingModel.id);
+                        } else {
+                          ProjectCubit.get(context)
+                              .deleteFollowing(fllowingId: followingModel.id);
+                        }
+                        print(followState);
+                      },
+                      child: Container(
+                        height: 30,
+                        decoration: BoxDecoration(
+                            color: followState ? Colors.black54 : switchColors,
+                            borderRadius: BorderRadius.circular(5)),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 15, vertical: 6),
+                          child: Text(
+                            followState ? 'Following' : 'Follow +',
+                            style: TextStyle(color: Colors.white, fontSize: 14),
+                          ),
+                        ),
+                      )))
+            ],
+          ),
+        ));
 Widget followersItem(bool followState, Function changeFollowState, context,
         Data? followingModel, List<dynamic> followingId) =>
-    InkWell(
-        onTap: () {},
-        child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: Container(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  CircleAvatar(
-                    backgroundImage: NetworkImage('${followingModel!.picture}'),
-                    radius: 30,
-                    backgroundColor: switchColors,
-                  ),
-                  SizedBox(
-                    width: 20,
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 10),
-                    child: Container(
-                      width: 100,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            '${followingModel.name}',
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                                color: textColor,
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  Spacer(),
-                  Padding(
-                      padding: const EdgeInsets.only(top: 15),
-                      child: InkWell(
-                          onTap: () {
-                            print(followState);
-                            changeFollowState();
-                            if (!followState) {
-                              ProjectCubit.get(context)
-                                  .addFollowing(fllowingId: followingModel.id);
-                            } else {
-                              ProjectCubit.get(context).deleteFollowing(
-                                  fllowingId: followingModel.id);
-                            }
-                            print(followState);
-                          },
-                          child: Container(
-                            height: 30,
-                            decoration: BoxDecoration(
-                                color:
-                                    followState ? Colors.black54 : switchColors,
-                                borderRadius: BorderRadius.circular(5)),
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 15, vertical: 6),
-                              child: Text(
-                                followState ? 'Following' : 'Follow +',
-                                style: TextStyle(
-                                    color: Colors.white, fontSize: 14),
-                              ),
-                            ),
-                          )))
-                ],
+    Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20),
+        child: Container(
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              CircleAvatar(
+                backgroundImage: NetworkImage('${followingModel!.picture}'),
+                radius: 30,
+                backgroundColor: switchColors,
               ),
-            )));
+              SizedBox(
+                width: 20,
+              ),
+              Padding(
+                padding: const EdgeInsets.only(top: 10),
+                child: Container(
+                  width: 100,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        '${followingModel.name}',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                            color: textColor,
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              Spacer(),
+              Padding(
+                  padding: const EdgeInsets.only(top: 15),
+                  child: InkWell(
+                      onTap: () {
+                        print(followState);
+                        changeFollowState();
+                        if (!followState) {
+                          ProjectCubit.get(context)
+                              .addFollowing(fllowingId: followingModel.id);
+                        } else {
+                          ProjectCubit.get(context)
+                              .deleteFollowing(fllowingId: followingModel.id);
+                        }
+                        print(followState);
+                      },
+                      child: Container(
+                        height: 30,
+                        decoration: BoxDecoration(
+                            color: followState ? Colors.black54 : switchColors,
+                            borderRadius: BorderRadius.circular(5)),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 15, vertical: 6),
+                          child: Text(
+                            followState ? 'Following' : 'Follow +',
+                            style: TextStyle(color: Colors.white, fontSize: 14),
+                          ),
+                        ),
+                      )))
+            ],
+          ),
+        ));
 Widget notificationItem() => InkWell(
     onTap: () {},
     child: Padding(

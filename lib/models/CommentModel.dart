@@ -2,12 +2,10 @@ class CommentModel {
   List<Data>? data;
 
   CommentModel.fromJson(List<dynamic> json) {
-    if (json != null) {
-      data = [];
-      json.forEach((v) {
-        data!.add(new Data.fromJson(v));
-      });
-    }
+    data = [];
+    json.forEach((v) {
+      data!.add(new Data.fromJson(v));
+    });
   }
 }
 

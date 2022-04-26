@@ -1,4 +1,6 @@
 import 'dart:io';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
@@ -8,11 +10,15 @@ import 'package:project_collage/Shared/network/cacheHelper.dart';
 import 'package:project_collage/Shared/network/dio_helper.dart';
 import 'package:project_collage/models/CategoryProductModel.dart';
 import 'package:project_collage/models/CommentModel.dart';
+import 'package:project_collage/models/ConversationModel.dart';
+import 'package:project_collage/models/FavoriteModel.dart';
 import 'package:project_collage/models/FollowingModel.dart';
-import 'package:project_collage/models/loginModel.dart';
+import 'package:project_collage/models/MessageConversationModel.dart';
+import 'package:project_collage/models/SendConversationModel.dart';
+import 'package:project_collage/models/LoginModel.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:project_collage/models/UserProductModel.dart';
-import 'package:project_collage/models/profileForSpecificUser.dart';
+import 'package:project_collage/models/ProfileForSpecificUser.dart';
 
 class ProjectCubit extends Cubit<ProjectStates> {
   ProjectCubit() : super(ProjectInitialStates());
@@ -296,5 +302,244 @@ class ProjectCubit extends Cubit<ProjectStates> {
       emit(DeleteCommentErrorState());
       print(error.toString());
     });
+  }
+
+  ConversationModel? conversationModel;
+  void getAllConversation() {
+    emit(GetConversatinLoadingState());
+    DioHelper.getData(url: conversations, token: token).then((value) {
+      conversationModel = ConversationModel.fromJson(value.data);
+      emit(GetConversatinSuccussState());
+    }).catchError((error) {
+      print(error.toString());
+      emit(GetConversatinErrorState());
+    });
+  }
+
+  dynamic converastionid;
+  void createConversation({@required userId}) {
+    emit(PostConversationLoadingState());
+    DioHelper.postData(
+        token: token,
+        url: conversationsStore,
+        data: {'user_id': userId}).then((value) {
+      if (value.data['converastion_id'] == null) {
+        converastionid = value.data['id_conversation'];
+      } else {
+        converastionid = value.data['converastion_id'];
+      }
+      getMessageForConversation(conversationId: converastionid);
+      print(converastionid);
+      print(value.data.toString());
+      emit(PostConversationSuccussState());
+    }).catchError((error) {
+      emit(PostConversationErrorState());
+      print(error.toString());
+    });
+  }
+
+  void seenMessaage({@required conversationId}) {
+    emit(PostConversationSeenLoadingState());
+    DioHelper.postData(
+            url: 'Conversations/read',
+            data: {'conversation_id': conversationId},
+            token: token)
+        .then((value) {
+      emit(PostConversationSeenSuccussState());
+      print(value.data);
+    }).catchError((error) {
+      print(error);
+      emit(PostConversationSeenErrorState());
+    });
+  }
+
+  MessageConversationModel? messageConversationModel;
+  void getMessageForConversation({@required conversationId}) {
+    emit(GetMessageConversationLoadingState());
+    DioHelper.getData(
+        url: messages,
+        token: token,
+        data: {'conversation_id': conversationId}).then((value) {
+      if (value.data['data'].isEmpty) {
+        print('object');
+        messageConversationModel = MessageConversationModel.fromJson({
+          'data': [
+            {
+              'id': 0,
+              'body': 'messageConversationModel1!.body',
+              'read': false,
+              'user_id': 2,
+              'conversation_id': conversationId,
+              'created_at': 'messageConversationModel1!.createdAt'
+            },
+          ]
+        });
+        print(conversationId);
+        sendMessage(
+            conversationId: conversationId,
+            body: 'messageConversationModel1!.body');
+      } else {
+        print(conversationId);
+        print('object1');
+        messageConversationModel =
+            MessageConversationModel.fromJson(value.data);
+      }
+
+      print(token);
+      emit(GetMessageConversationSuccussState());
+    }).catchError((error) {
+      emit(GetMessageConversationErrorState());
+      print(error.toString());
+    });
+  }
+
+  SendConversationModel? sendConversationModel;
+  void sendMessage({@required conversationId, @required body}) {
+    emit(PostSendConversationLoadingState());
+    DioHelper.postData(
+        url: 'send_message',
+        token: token,
+        data: {'conversation_id': conversationId, 'body': body}).then((value) {
+      emit(PostSendConversationSuccussState());
+    }).catchError((error) {
+      print(error);
+      emit(PostSendConversationErrorState());
+    });
+  }
+
+  final DatabaseReference database = FirebaseDatabase.instanceFor(
+          databaseURL:
+              'https://eccumerceprogect-default-rtdb.europe-west1.firebasedatabase.app/',
+          app: Firebase.app())
+      .ref('message');
+  int count = 1;
+  void realTimeDatabase({@required text, @required conversationId}) {
+    emit(RealTimeLoadingState());
+    database.set({
+      "id": count,
+      "body": text,
+      "read": false,
+      "user_id": myId,
+      "conversation_id": conversationId,
+      "created_at": DateTime.now().toString()
+    }).then((value) {
+      ++count;
+      emit(RealTimeSuccussState());
+      listenToDatabase();
+      print('the message has been send');
+    }).catchError((error) {
+      emit(RealTimeErrorState());
+      print(error.toString());
+    });
+  }
+
+  Data1? messageConversationModel1;
+  var value;
+  void listenToDatabase() {
+    emit(RealTimeSuccussState());
+    database.onValue.listen((event) {
+      print(event.snapshot.value);
+      messageConversationModel1 = Data1.fromJseon(event.snapshot.value);
+      if (messageConversationModel1!.id !=
+          messageConversationModel!.data!.last.id) {
+        messageConversationModel!.data!.add(messageConversationModel1!);
+      }
+
+      ++count;
+      print(messageConversationModel!.data![0].body);
+      emit(RealTimeSuccussState());
+    });
+  }
+
+  void addFavorite({@required productId}) {
+    emit(PostFavoriteLoadingState());
+    DioHelper.postData(
+            url: storeFavoriteItem,
+            data: {'product_id': productId},
+            token: token)
+        .then((value) {
+      emit(PostFavoriteSuccussState());
+      print(value.data.toString());
+    }).catchError((error) {
+      print(error.toString());
+      emit(PostFavoriteErrorState());
+    });
+  }
+
+  FavoriteModel? favoriteModel;
+  void getFavorite() {
+    emit(GetFavoriteLoadingState());
+    DioHelper.getData(url: favoritesProducts, token: token).then((value) {
+      favoriteModel = FavoriteModel.fromJson(value.data);
+      print(favoriteModel!.data![0].id);
+      emit(GetFavoriteSuccussState());
+    }).catchError((error) {
+      print(error.toString());
+      emit(GetFavoriteErrorState());
+    });
+  }
+
+  void deleteFavorite({@required productId}) {
+    emit(DeleteFavoriteLoadingState());
+    DioHelper.postData(
+            url: deleteFavoriteItem,
+            data: {'product_id': productId},
+            token: token)
+        .then((value) {
+      emit(DeleteFavoriteSuccussState());
+      print(value.data.toString());
+    }).catchError((error) {
+      emit(DeleteFavoriteErrorState());
+      print(error.toString());
+    });
+  }
+
+  List<dynamic>? followersCache = [];
+
+  void addFollowersCache({@required value}) {
+    followersCache!.add(value);
+    emit(AddTofollowingCache());
+  }
+
+  void changeFollowersModel() {
+    if (followersCache!.isNotEmpty) {
+      followersModel = followersCache![followersCache!.length - 1];
+    }
+    emit(AddTofollowingCache());
+    if (followersCache!.isNotEmpty) {
+      followersCache!.removeLast();
+    }
+  }
+
+  List<dynamic>? followingCache = [];
+  void addFollowingCache({@required value}) {
+    followingCache!.add(value);
+    emit(AddTofollowingCache());
+  }
+
+  void changeFollowingModel() {
+    if (followingCache!.isNotEmpty) {
+      followingModel = followingCache![followingCache!.length - 1];
+    }
+    emit(AddTofollowingCache());
+    if (followingCache!.isNotEmpty) {
+      followingCache!.removeLast();
+    }
+  }
+
+  List<dynamic>? profileCache = [];
+  void addprofileCache({@required value}) {
+    profileCache!.add(value);
+    emit(AddTofollowingCache());
+  }
+
+  void changeprofileModel() {
+    if (profileCache!.isNotEmpty) {
+      profile = profileCache![profileCache!.length - 1];
+    }
+    emit(AddTofollowingCache());
+    if (profileCache!.isNotEmpty) {
+      profileCache!.removeLast();
+    }
   }
 }

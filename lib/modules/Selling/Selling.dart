@@ -100,6 +100,23 @@ class SellingScreen extends StatelessWidget {
                                       );
                                     },
                                     child: categoryItem(
+                                        deleteFavorite: () {
+                                          ProjectCubit.get(context)
+                                              .deleteFavorite(
+                                                  productId:
+                                                      ProjectCubit.get(context)
+                                                          .productModel
+                                                          ?.data![index]
+                                                          .id);
+                                        },
+                                        addFavorite: () {
+                                          ProjectCubit.get(context).addFavorite(
+                                              productId:
+                                                  ProjectCubit.get(context)
+                                                      .productModel
+                                                      ?.data![index]
+                                                      .id);
+                                        },
                                         body: ProjectCubit.get(context)
                                             .productModel
                                             ?.data![index]

@@ -2,7 +2,6 @@ import 'package:conditional_builder_null_safety/conditional_builder_null_safety.
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:project_collage/modules/Home/home.dart';
-
 import 'package:project_collage/modules/Login/cubit/LoginCubit.dart';
 import 'package:project_collage/modules/Login/cubit/LoginStates.dart';
 import 'package:project_collage/modules/Register/register.dart';

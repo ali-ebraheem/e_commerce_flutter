@@ -67,6 +67,7 @@ class HomeScreen extends StatelessWidget {
                         backgroundColor: secondColor,
                         child: IconButton(
                           onPressed: () {
+                            ProjectCubit.get(context).getAllConversation();
                             Navigator.push(
                               context,
                               MaterialPageRoute(
@@ -193,6 +194,7 @@ class HomeScreen extends StatelessWidget {
                                     ),
                                     InkWell(
                                       onTap: () {
+                                        ProjectCubit.get(context).getFavorite();
                                         Navigator.push(
                                           context,
                                           MaterialPageRoute(
