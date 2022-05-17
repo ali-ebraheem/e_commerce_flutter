@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:project_collage/Shared/components/components.dart';
+import 'package:project_collage/modules/ChangePassowrd/changePassowd.dart';
 
 class SettingScreen extends StatelessWidget {
   @override
@@ -57,9 +58,17 @@ class SettingScreen extends StatelessWidget {
             ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-              child: Text(
-                'Change passowrd',
-                style: TextStyle(color: textColor, fontSize: 16),
+              child: GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => ChangePasswordScreen()));
+                },
+                child: Text(
+                  'Change passowrd',
+                  style: TextStyle(color: textColor, fontSize: 16),
+                ),
               ),
             ),
             Padding(

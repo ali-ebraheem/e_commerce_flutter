@@ -542,4 +542,28 @@ class ProjectCubit extends Cubit<ProjectStates> {
       profileCache!.removeLast();
     }
   }
+
+  String? validConfirmPassword;
+  String? validOldPassword;
+  String? validNewPassword;
+  Future changePassword(
+      {@required newPassowrd,
+      @required cNewPassowrd,
+      @required oldPassorwd}) async {
+    emit(ChangePasswordLoadingState());
+    await DioHelper.postData(url: changePasssword, token: token, data: {
+      'oldpassword': oldPassorwd,
+      'new_password': newPassowrd,
+      'confirm_password': cNewPassowrd
+    }).then((value) {
+      emit(ChangePasswordSuccussState());
+      validConfirmPassword = value.data['confirm_password'].toString();
+      validOldPassword = value.data['oldpassword'].toString();
+      validNewPassword = value.data['new_password'].toString();
+      print(value.data['confirm_password'].toString());
+    }).catchError((error) {
+      emit(ChangePasswordErrorState());
+      print(error);
+    });
+  }
 }

@@ -31,6 +31,7 @@ const String storeFavoriteItem = 'store_favorite_item';
 const String favoritesProducts = 'favorites_Products';
 const String deleteFavoriteItem = 'delete_favorite_item';
 const String messages = 'messages';
+const String changePasssword = 'change_password';
 String token = CacheHelper.getData(key: 'token');
 String email = CacheHelper.getData(key: 'email');
 String name = CacheHelper.getData(key: 'name');

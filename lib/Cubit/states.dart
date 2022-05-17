@@ -137,3 +137,9 @@ class GetMessageConversationErrorState extends ProjectStates {}
 class GetMessageConversationLoadingState extends ProjectStates {}
 
 class GetMessageConversationSuccussState extends ProjectStates {}
+
+class ChangePasswordErrorState extends ProjectStates {}
+
+class ChangePasswordLoadingState extends ProjectStates {}
+
+class ChangePasswordSuccussState extends ProjectStates {}

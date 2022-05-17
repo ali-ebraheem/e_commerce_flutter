@@ -114,11 +114,10 @@ class ProductScreen extends StatelessWidget {
                                         offset: offcet,
                                         count: product.images!.length,
                                         effect: WormEffect(
-                                          dotColor:
-                                              Color.fromARGB(95, 65, 65, 65),
-                                          dotHeight: 10,
-                                          dotWidth: 10,
-                                          activeDotColor: Colors.black,
+                                          dotColor: secondColor,
+                                          dotHeight: 8,
+                                          dotWidth: 8,
+                                          activeDotColor: switchColors,
                                         )),
                                   ),
                                 ]),
