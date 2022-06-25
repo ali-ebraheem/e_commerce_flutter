@@ -35,7 +35,8 @@ class MyApp extends StatelessWidget {
     return BlocProvider(
         create: (BuildContext context) => ProjectCubit()
           ..getProductForUser()
-          ..getCategories(),
+          ..getCategories()
+          ..getSearchProduct(searchItem: 'jftyjtyjnfyjhfgjtfyj'),
         child: MaterialApp(
           debugShowCheckedModeBanner: false,
           theme: ThemeData(

@@ -143,3 +143,9 @@ class ChangePasswordErrorState extends ProjectStates {}
 class ChangePasswordLoadingState extends ProjectStates {}
 
 class ChangePasswordSuccussState extends ProjectStates {}
+
+class SearchErrorState extends ProjectStates {}
+
+class SearchLoadingState extends ProjectStates {}
+
+class SearchSuccussState extends ProjectStates {}

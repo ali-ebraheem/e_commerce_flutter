@@ -566,4 +566,17 @@ class ProjectCubit extends Cubit<ProjectStates> {
       print(error);
     });
   }
+
+  CategoryProductModel? searchItemModel;
+  void getSearchProduct({@required searchItem}) {
+    emit(SearchLoadingState());
+    DioHelper.getData(url: 'searchProducts', data: {'search': searchItem})
+        .then((value) {
+      emit(SearchSuccussState());
+      searchItemModel = CategoryProductModel.fromJson(value.data);
+    }).catchError((error) {
+      emit(SearchErrorState());
+      print(error.toString());
+    });
+  }
 }

@@ -257,9 +257,7 @@ Widget categoryItem({
                           fontSize: 16,
                           fontWeight: FontWeight.bold),
                     ),
-                    SizedBox(
-                      height: 10,
-                    ),
+                    Spacer(),
                     Text(
                       '$price\$',
                       style: TextStyle(
@@ -267,9 +265,7 @@ Widget categoryItem({
                           fontSize: 16,
                           fontWeight: FontWeight.bold),
                     ),
-                    SizedBox(
-                      height: 10,
-                    ),
+                    Spacer(),
                     Text(
                       body,
                       maxLines: 3,

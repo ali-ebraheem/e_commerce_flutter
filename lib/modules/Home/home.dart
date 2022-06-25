@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:project_collage/Cubit/cubit.dart';
 import 'package:project_collage/Cubit/states.dart';
+import 'package:project_collage/Modules/Search/Search.dart';
 import 'package:project_collage/Shared/components/components.dart';
 import 'package:project_collage/modules/Categories/Categories.dart';
 import 'package:project_collage/modules/Dashboard/Dashboard.dart';
@@ -121,32 +122,40 @@ class HomeScreen extends StatelessWidget {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             //Search
-                            Padding(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 20, vertical: 10),
-                              child: Container(
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(20),
-                                    color: secondColor,
-                                  ),
-                                  width: double.infinity,
-                                  height: 40,
-                                  child: TextField(
-                                      style: TextStyle(fontSize: 22),
-                                      decoration: InputDecoration(
-                                        prefixIcon: Padding(
-                                          padding: EdgeInsets.fromLTRB(
-                                              10, 10, 10, 10),
-                                          child: SvgPicture.asset(
-                                            "assets/icons/Search Icon.svg",
-                                            height: 20,
-                                            width: 20,
-                                            color: Colors.black87,
-                                          ),
-                                        ),
-                                        border: InputBorder.none,
-                                      ))),
+                            GestureDetector(
+                              onTap: () {
+                                ProjectCubit.get(context).getSearchProduct(
+                                    searchItem: 'hgiruhtugkthskg');
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => SearchScreen()),
+                                );
+                              },
+                              child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 20, vertical: 10),
+                                  child: Container(
+                                    alignment: Alignment.centerLeft,
+                                    width: double.infinity,
+                                    height: 40,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(20),
+                                      color: secondColor,
+                                    ),
+                                    child: Padding(
+                                      padding:
+                                          EdgeInsets.fromLTRB(10, 10, 10, 10),
+                                      child: SvgPicture.asset(
+                                        "assets/icons/Search Icon.svg",
+                                        height: 20,
+                                        width: 20,
+                                        color: Colors.black87,
+                                      ),
+                                    ),
+                                  )),
                             ),
+
                             SizedBox(
                               height: 20,
                             ),
